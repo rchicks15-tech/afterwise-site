@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Afterwise — Intelligence After the Fact</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Fraunces:ital,opsz,wght@0,9..144,200;0,9..144,400;1,9..144,200&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #080e1a;
+    --surface: #0d1626;
+    --border: #1e3a5f;
+    --accent: #4a9eff;
+    --accent2: #7eb8f7;
+    --text: #e8edf5;
+    --muted: #5a7a9a;
+    --dim: #1e3a5f;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.15s ease;
+    opacity: 0.5;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,240,96,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,240,96,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 4rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,11,13,0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.12em;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .logo span { color: var(--accent); }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    padding: 0.6rem 1.6rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .nav-cta:hover { background: var(--accent2); transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 8rem 4rem 4rem;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 2rem;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(3.5rem, 6vw, 6rem);
+    font-weight: 200;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 0.8rem;
+    line-height: 1.8;
+    color: var(--muted);
+    max-width: 420px;
+    margin-bottom: 3rem;
+    letter-spacing: 0.02em;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent2);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .btn-primary:hover::after { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 1rem 2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: none;
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Hero visual - document analyzer animation */
+  .hero-visual {
+    position: relative;
+    height: 520px;
+  }
+
+  .doc-stack {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .doc-card {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    width: 300px;
+    animation: float-card 6s ease-in-out infinite;
+  }
+
+  .doc-card:nth-child(1) { transform: rotate(-4deg) translate(-60px, 20px); animation-delay: 0s; }
+  .doc-card:nth-child(2) { transform: rotate(2deg) translate(40px, -30px); animation-delay: 1s; z-index: 2; }
+  .doc-card:nth-child(3) { transform: rotate(-1deg) translate(-20px, 60px); animation-delay: 2s; }
+
+  @keyframes float-card {
+    0%, 100% { transform-origin: center; }
+    50% { transform: rotate(-4deg) translate(-60px, 10px) scale(1.01); }
+  }
+  .doc-card:nth-child(2) {
+    animation: float-card2 6s ease-in-out infinite;
+    animation-delay: 1s;
+  }
+  @keyframes float-card2 {
+    0%, 100% { transform: rotate(2deg) translate(40px, -30px); }
+    50% { transform: rotate(2deg) translate(40px, -40px) scale(1.01); }
+  }
+  .doc-card:nth-child(3) {
+    animation: float-card3 6s ease-in-out infinite;
+    animation-delay: 2s;
+  }
+  @keyframes float-card3 {
+    0%, 100% { transform: rotate(-1deg) translate(-20px, 60px); }
+    50% { transform: rotate(-1deg) translate(-20px, 50px) scale(1.01); }
+  }
+
+  .doc-type {
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .doc-type::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .doc-lines { display: flex; flex-direction: column; gap: 0.4rem; }
+  .doc-line {
+    height: 6px;
+    background: var(--dim);
+    border-radius: 2px;
+    animation: scan 3s ease-in-out infinite;
+  }
+  .doc-line:nth-child(1) { width: 85%; animation-delay: 0.1s; }
+  .doc-line:nth-child(2) { width: 70%; animation-delay: 0.2s; }
+  .doc-line:nth-child(3) { width: 90%; animation-delay: 0.3s; }
+  .doc-line:nth-child(4) { width: 60%; animation-delay: 0.4s; }
+  .doc-line:nth-child(5) { width: 78%; animation-delay: 0.5s; }
+
+  @keyframes scan {
+    0%, 100% { background: var(--dim); }
+    50% { background: rgba(200,240,96,0.15); }
+  }
+
+  /* Floating output badge */
+  .output-badge {
+    position: absolute;
+    bottom: 40px;
+    right: 20px;
+    background: var(--accent);
+    color: #ffffff;
+    padding: 0.75rem 1.25rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    animation: badge-appear 1s ease 0.5s both;
+  }
+  @keyframes badge-appear {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .badge-icon { font-size: 1rem; }
+  .badge-text { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
+
+  /* STATS BAR */
+  .stats-bar {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .stat-item {
+    padding: 2.5rem 3rem;
+    border-right: 1px solid var(--border);
+    opacity: 0;
+    animation: fade-up 0.6s ease forwards;
+  }
+  .stat-item:nth-child(1) { animation-delay: 0.1s; }
+  .stat-item:nth-child(2) { animation-delay: 0.2s; }
+  .stat-item:nth-child(3) { animation-delay: 0.3s; }
+  .stat-item:nth-child(4) { animation-delay: 0.4s; border-right: none; }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .stat-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .stat-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* HOW IT WORKS */
+  .section {
+    position: relative;
+    z-index: 1;
+    padding: 8rem 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 2rem;
+    margin-bottom: 5rem;
+  }
+
+  .section-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem;
+    color: var(--dim);
+    line-height: 1;
+  }
+
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2rem, 3.5vw, 3.5rem);
+    font-weight: 200;
+    letter-spacing: -0.02em;
+  }
+  .section-title em { color: var(--accent); font-style: italic; }
+
+  .process-flow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    position: relative;
+  }
+
+  .process-flow::before {
+    content: '';
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    right: 2rem;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+    opacity: 0.3;
+  }
+
+  .process-step {
+    padding: 3rem 2rem 2rem;
+    border-right: 1px solid var(--border);
+    position: relative;
+    transition: background 0.3s;
+  }
+  .process-step:last-child { border-right: none; }
+  .process-step:hover { background: var(--surface); }
+
+  .step-dot {
+    width: 4rem;
+    height: 4rem;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    color: var(--accent);
+    background: var(--bg);
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s;
+  }
+  .process-step:hover .step-dot {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .step-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: 0.75rem;
+  }
+  .step-desc {
+    font-size: 0.7rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .feature-card {
+    background: var(--bg);
+    padding: 3rem 2.5rem;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .feature-card:hover::before { transform: scaleX(1); }
+  .feature-card:hover { background: var(--surface); }
+
+  .feature-icon {
+    width: 3rem; height: 3rem;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s;
+  }
+  .feature-card:hover .feature-icon {
+    border-color: var(--accent);
+    background: rgba(200,240,96,0.08);
+  }
+
+  .feature-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: 0.75rem;
+  }
+  .feature-desc {
+    font-size: 0.7rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  /* INPUT TYPES */
+  .inputs-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 1;
+    padding: 6rem 4rem;
+  }
+
+  .inputs-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 6rem;
+    align-items: center;
+  }
+
+  .input-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .tag {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: all 0.2s;
+    cursor: none;
+  }
+  .tag:hover, .tag.lit {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(200,240,96,0.06);
+  }
+
+  /* OUTPUT PREVIEW */
+  .output-preview {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .output-header {
+    background: var(--surface);
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .output-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .od-r { background: #ff5f57; }
+  .od-y { background: #febc2e; }
+  .od-g { background: var(--accent); }
+
+  .output-body { padding: 2rem; }
+
+  .aar-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    font-weight: 200;
+    margin-bottom: 0.4rem;
+    color: var(--text);
+  }
+  .aar-meta {
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  .aar-metric-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .aar-metric {
+    background: var(--surface);
+    padding: 1rem;
+    border-left: 2px solid var(--accent);
+  }
+
+  .aar-metric-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .aar-metric-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.2rem;
+  }
+
+  .aar-finding {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.68rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .aar-finding::before {
+    content: '→';
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* CTA */
+  .cta-section {
+    position: relative;
+    z-index: 1;
+    padding: 10rem 4rem;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: 'AFTERWISE';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22vw;
+    color: var(--surface);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .cta-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2.5rem, 4.5vw, 5rem);
+    font-weight: 200;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+  }
+  .cta-title em { color: var(--accent); font-style: italic; }
+
+  .cta-sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto 3rem;
+    line-height: 1.8;
+  }
+
+  .cta-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2.5rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .footer-logo span { color: var(--accent); }
+
+  .footer-copy {
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+  .footer-links a {
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--accent); }
+
+  /* PM VALUE SECTION */
+  .pm-value-section {
+    position: relative;
+    z-index: 1;
+    padding: 8rem 4rem;
+    border-top: 1px solid var(--border);
+  }
+  .pm-value-inner { max-width: 1400px; margin: 0 auto; }
+  .pm-value-header {
+    display: flex;
+    align-items: baseline;
+    gap: 2rem;
+    margin-bottom: 4rem;
+  }
+  .pm-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .pm-card {
+    background: var(--bg);
+    padding: 2.5rem 2rem;
+    transition: background 0.3s;
+    position: relative;
+  }
+  .pm-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent2);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .pm-card:hover::after { transform: scaleX(1); }
+  .pm-card:hover { background: var(--surface); }
+  .pm-card-top {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .pm-icon { font-size: 1.3rem; }
+  .pm-tag {
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    border: 1px solid rgba(74,240,192,0.3);
+    padding: 0.2rem 0.6rem;
+  }
+  .pm-card-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1rem;
+    font-weight: 400;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+  .pm-card-desc {
+    font-size: 0.68rem;
+    line-height: 1.75;
+    color: var(--muted);
+  }
+
+  @media (max-width: 768px) {
+    .pm-value-section { padding: 4rem 1.5rem; }
+    .pm-cards { grid-template-columns: 1fr; }
+  }
+
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .hero { padding: 6rem 1.5rem 3rem; }
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-visual { display: none; }
+    .stats-bar { grid-template-columns: 1fr 1fr; }
+    .section { padding: 4rem 1.5rem; }
+    .process-flow { grid-template-columns: 1fr 1fr; }
+    .features-grid { grid-template-columns: 1fr; }
+    .inputs-inner { grid-template-columns: 1fr; gap: 3rem; }
+    .cta-section { padding: 6rem 1.5rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">After<span>wise</span></a>
+  <ul class="nav-links">
+    <li><a href="#process">How It Works</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#output">Output</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <button class="nav-cta" onclick="window.location.href='app.html'">Request Demo</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Performance Intelligence</div>
+      <h1 class="hero-title">
+        Turn program data into<br>
+        <em>actionable lessons learned</em> —<br>automatically.
+      </h1>
+      <p class="hero-sub">
+        Afterwise transforms project notes, reports, and review material into automated after-action insights for defense program teams. By analyzing schedule, performance, and cost data, the platform generates structured lessons learned, identifies recurring risks, and produces executive-ready summaries — helping organizations learn faster and improve every contract cycle.
+      </p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="window.location.href='app.html'"><span>Request Early Access</span></button>
+        <button class="btn-ghost" onclick="window.location.href='app.html'">See a Sample AAR</button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="doc-stack">
+        <div class="doc-card">
+          <div class="doc-type">Contract Document</div>
+          <div class="doc-lines">
+            <div class="doc-line"></div>
+            <div class="doc-line"></div>
+            <div class="doc-line"></div>
+            <div class="doc-line"></div>
+            <div class="doc-line"></div>
+          </div>
+        </div>
+        <div class="doc-card">
+          <div class="doc-type">Schedule Report</div>
+          <div class="doc-lines">
+            <div class="doc-line"></div>
+            <div class="doc-line"></div>
+            <div class="doc-line"></div>
+            <div class="doc-line"></div>
+            <div class="doc-line"></div>
+          </div>
+        </div>
+        <div class="doc-card">
+          <div class="doc-type">Performance Report</div>
+          <div class="doc-lines">
+            <div class="doc-line"></div>
+            <div class="doc-line"></div>
+            <div class="doc-line"></div>
+            <div class="doc-line"></div>
+            <div class="doc-line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="output-badge">
+        <span class="badge-icon">⚡</span>
+        <span class="badge-text">AAR Generated — 94% time savings</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-number">94%</div>
+    <div class="stat-label">Reduction in reporting time</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">12+</div>
+    <div class="stat-label">Document types supported</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">100%</div>
+    <div class="stat-label">Data-backed findings</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-number">~0</div>
+    <div class="stat-label">Manual reporting hours</div>
+  </div>
+</div>
+
+<!-- PROCESS -->
+<div id="process" class="section reveal">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <h2 class="section-title">From raw data to <em>structured insight</em></h2>
+  </div>
+  <div class="process-flow">
+    <div class="process-step">
+      <div class="step-dot">01</div>
+      <h3 class="step-title">Upload</h3>
+      <p class="step-desc">Contracts, emails, engineering specs, performance records. Any format, any mix.</p>
+    </div>
+    <div class="process-step">
+      <div class="step-dot">02</div>
+      <h3 class="step-title">Analyze</h3>
+      <p class="step-desc">Cross-references every document. Surfaces patterns, variances, obligation gaps, and performance issues.</p>
+    </div>
+    <div class="process-step">
+      <div class="step-dot">03</div>
+      <h3 class="step-title">Quantify</h3>
+      <p class="step-desc">Qualitative findings converted to hard metrics — schedule variance, cost efficiency, risk exposure, performance scores.</p>
+    </div>
+    <div class="process-step">
+      <div class="step-dot">04</div>
+      <h3 class="step-title">Deliver</h3>
+      <p class="step-desc">Structured AAR and briefing-ready PowerPoint. Referenced, scored, delivered in minutes.</p>
+    </div>
+  </div>
+</div>
+
+<!-- INPUT TYPES -->
+<div class="inputs-section" id="output">
+  <div class="inputs-inner">
+    <div class="reveal">
+      <div class="section-header" style="margin-bottom: 2rem;">
+        <div class="section-num">03</div>
+      </div>
+      <h2 class="section-title" style="font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 200; margin-bottom: 1.5rem;">Every Document. <em>One Platform.</em></h2>
+      <p style="font-size: 0.72rem; color: var(--muted); line-height: 1.8; margin-bottom: 2rem;">Afterwise is built for the full complexity of real programs. No templates, no reformatting.</p>
+      <div class="input-tags">
+        <div class="tag lit">Contracts</div>
+        <div class="tag">Email Chains</div>
+        <div class="tag lit">SOWs</div>
+        <div class="tag">Engineering Docs</div>
+        <div class="tag">Performance Plans</div>
+        <div class="tag lit">Meeting Minutes</div>
+        <div class="tag">CDRLs</div>
+        <div class="tag">RFPs / RFIs</div>
+        <div class="tag">Budget Reports</div>
+        <div class="tag lit">Risk Registers</div>
+        <div class="tag">Change Orders</div>
+        <div class="tag">Status Reports</div>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="output-preview">
+        <div class="output-header">
+          <div class="output-dot od-r"></div>
+          <div class="output-dot od-y"></div>
+          <div class="output-dot od-g"></div>
+          <span style="margin-left: 0.5rem;">afterwise_AAR_output.pptx</span>
+        </div>
+        <div class="output-body">
+          <div class="aar-title">Program Evaluation — After Action Report</div>
+          <div class="aar-meta">Generated by Afterwise · 47 documents analyzed · Confidence: 96.2%</div>
+          <div class="aar-metric-row">
+            <div class="aar-metric">
+              <div class="aar-metric-val">-11%</div>
+              <div class="aar-metric-label">Schedule Variance</div>
+            </div>
+            <div class="aar-metric">
+              <div class="aar-metric-val">82.4</div>
+              <div class="aar-metric-label">Performance Score</div>
+            </div>
+            <div class="aar-metric">
+              <div class="aar-metric-val">3</div>
+              <div class="aar-metric-label">Critical Gaps Found</div>
+            </div>
+          </div>
+          <div class="aar-finding">Communication volume between the Government PM office and Contractor XYZ increased 34% in the 18 days following Mod 7 (engineering requirement change). This spike correlated with a 12-day delay on CDRLs A004 and A006, contributing to a 3.1% schedule slip and an estimated $214K cost overrun. <strong style="color:var(--accent);">Recommendation:</strong> Establish a formal change notification protocol requiring joint impact assessments within 5 business days of any contract modification.</div>
+          <div class="aar-finding">Production milestone MS-4 was missed by 23 days. Root cause trace: 6 of 9 predecessor tasks were delayed by an average of 4.2 days due to unresolved RFIs — 83% of which originated from a single subcontractor. <strong style="color:var(--accent);">Recommendation:</strong> Require weekly RFI burn-down reporting from all Tier-1 subcontractors; escalate any RFI unresolved beyond 7 days to the COR.</div>
+          <div class="aar-finding">Cost Performance Index (CPI) dropped from 0.97 to 0.84 between months 8–11, driven by a 17% labor hour overrun in systems integration. Engineering change orders in this period averaged 2.3x the baseline estimate. <strong style="color:var(--accent);">Recommendation:</strong> Apply a minimum 1.4x labor multiplier to ECO estimates for integration-phase work in future contract planning.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PM VALUE SECTION -->
+<div class="pm-value-section">
+  <div class="pm-value-inner">
+    <div class="pm-value-header reveal">
+      <div class="section-num">02</div>
+      <h2 class="section-title">Built for the <em>Program Manager.</em></h2>
+    </div>
+    <div class="pm-cards reveal">
+      <div class="pm-card">
+        <div class="pm-card-top">
+          <span class="pm-icon">⏱</span>
+          <span class="pm-tag">Time</span>
+        </div>
+        <h3 class="pm-card-title">Hours back in your week</h3>
+        <p class="pm-card-desc">AAR compilation used to take days. Afterwise does it in minutes. Spend your time acting on findings, not producing them.</p>
+      </div>
+      <div class="pm-card">
+        <div class="pm-card-top">
+          <span class="pm-icon">👥</span>
+          <span class="pm-tag">Team Performance</span>
+        </div>
+        <h3 class="pm-card-title">Understand your team with clarity</h3>
+        <p class="pm-card-desc">Know where your team performed and where they didn't — sourced directly from your program documents. No surveys. No guesswork.</p>
+      </div>
+      <div class="pm-card">
+        <div class="pm-card-top">
+          <span class="pm-icon">📊</span>
+          <span class="pm-tag">Program Reviews</span>
+        </div>
+        <h3 class="pm-card-title">Walk into every review confident</h3>
+        <p class="pm-card-desc">Structured findings, sourced recommendations, clean visuals. Brief directly from the output — no weekend deck-building required.</p>
+      </div>
+      <div class="pm-card">
+        <div class="pm-card-top">
+          <span class="pm-icon">🔁</span>
+          <span class="pm-tag">Continuous Improvement</span>
+        </div>
+        <h3 class="pm-card-title">Lessons that actually carry forward</h3>
+        <p class="pm-card-desc">Lessons learned that are searchable, comparable across contracts, and actually used. Institutional knowledge that carries forward.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div id="features" class="section reveal">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <h2 class="section-title"><em>Objective</em> Evaluation.</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📄</div>
+      <h3 class="feature-title">Multi-Document Synthesis</h3>
+      <p class="feature-desc">Hundreds of documents cross-referenced simultaneously. Connections and contradictions surfaced that manual review would miss.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📐</div>
+      <h3 class="feature-title">Data-Backed Findings</h3>
+      <p class="feature-desc">Every finding is quantified. Schedule variance, cost efficiency ratios, performance deltas — all derived from your source documents, not assumptions.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3 class="feature-title">Instant Generation</h3>
+      <p class="feature-desc">What takes a team weeks is done in minutes. Upload, analyze, receive a citation-backed AAR.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3 class="feature-title">Structured Output</h3>
+      <p class="feature-desc">Formatted PowerPoint and written report. Executive summary, findings, metrics dashboard, corrective actions. Brief-ready.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <h3 class="feature-title">Source-Referenced</h3>
+      <p class="feature-desc">Every finding traces to a specific document and page. Reviewers can verify anything, instantly.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔄</div>
+      <h3 class="feature-title">Program-Agnostic</h3>
+      <p class="feature-desc">Defense, infrastructure, commercial — Afterwise adapts its evaluation framework to your program type automatically.</p>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<section class="cta-section reveal" id="contact">
+  <h2 class="cta-title">Every contract cycle<br>is a chance to <em>improve.</em><br>Start capturing it.</h2>
+  <p class="cta-sub">Afterwise is in early access. Upload your program documents and see a structured AAR generated in real time.</p>
+  <div class="cta-actions">
+    <button class="btn-primary" onclick="window.location.href='app.html'"><span>Request Early Access</span></button>
+    <button class="btn-ghost" onclick="window.location.href='app.html'">Contact the Team</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">After<span>wise</span></div>
+  <div class="footer-copy">© 2025 Afterwise. All rights reserved.</div>
+  <ul class="footer-links">
+    <li><a href="#">Privacy</a></li>
+    <li><a href="#">Terms</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 4 + 'px';
+    cursor.style.top = my - 4 + 'px';
+  });
+
+  function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    cursorRing.style.left = rx - 16 + 'px';
+    cursorRing.style.top = ry - 16 + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+
+  document.querySelectorAll('button, a, .tag').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'scale(2)';
+      cursorRing.style.transform = 'scale(1.5)';
+      cursorRing.style.borderColor = 'var(--accent2)';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'scale(1)';
+      cursorRing.style.transform = 'scale(1)';
+      cursorRing.style.borderColor = 'var(--accent)';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => obs.observe(r));
+
+  // Animate tags
+  const tags = document.querySelectorAll('.tag');
+  let tagIdx = 0;
+  setInterval(() => {
+    tags.forEach(t => t.classList.remove('lit'));
+    const pick = Math.floor(Math.random() * tags.length);
+    tags[pick].classList.add('lit');
+  }, 1200);
+</script>
+</body>
+</html>
